@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- XMLittré DTD -->
+
+<!ELEMENT xmlittre (entree+)>
+<!ATTLIST xmlittre lettre CDATA #REQUIRED>
+
+<!ELEMENT entree (entete,résumé?,corps,rubrique*)>
+<!ATTLIST entree terme CDATA #REQUIRED>
+<!ATTLIST entree supplement (0|1) "0">
+<!ATTLIST entree sens (1|2|3|4|5|6|7|8|9) "1">
+
+<!-- <!ELEMENT entete ANY> -->
+<!ELEMENT entete (#PCDATA|prononciation|nature|indent|cit|a|semantique)*>
+<!ELEMENT prononciation (#PCDATA|cit|a|i|span)*>
+
+<!ELEMENT nature (#PCDATA)>
+
+<!ELEMENT corps (variante|rubrique)*>
+<!-- <!ELEMENT rubrique (#PCDATA|variante|indent|rubrique)*> -->
+<!ELEMENT rubrique ANY>
+<!-- pb avec cette liste (REMARQUE|REMARQUES|ÉTYMOLOGIE|SUPPLÉMENT AU DICTIONNAIRE|SYNONYME|HISTORIQUE) à cause des espaces -->
+<!ATTLIST rubrique nom CDATA #REQUIRED>
+<!ELEMENT indent (#PCDATA|indent|variante|cit|nature|semantique|exemple|a|i|span)*>
+<!ELEMENT variante (#PCDATA|indent|cit|nature|semantique|exemple|a|i|span|rubrique)*>
+<!ATTLIST variante
+	num CDATA #IMPLIED
+	option (résumé) #IMPLIED
+>
+<!ELEMENT résumé (indent|variante)*>
+
+<!ELEMENT cit (#PCDATA|a|i|span)*>
+<!ATTLIST cit
+	aut CDATA #IMPLIED
+	ref CDATA #IMPLIED
+	fix CDATA #IMPLIED
+	hide (aut|ref|both) #IMPLIED
+>
+
+<!ELEMENT a (#PCDATA|nature)*>
+<!ATTLIST a ref CDATA #REQUIRED>
+
+<!ELEMENT i (#PCDATA)*>
+<!ATTLIST i class (botanique) #IMPLIED>
+<!ATTLIST i lang (ar|de|en|es|fr|it|la|sa|syc) #IMPLIED>
+
+<!ELEMENT span (#PCDATA|a|i)*>
+<!ATTLIST span lang (ar|de|en|es|fr|it|la|sa|syc) #IMPLIED>
+
+<!ELEMENT exemple (#PCDATA|a)*>
+
+<!ELEMENT semantique (#PCDATA)>
+<!ATTLIST semantique type (indicateur|domaine) #IMPLIED>
