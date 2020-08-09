@@ -1,20 +1,26 @@
 from lxml import etree
 import os
 import unicodedata
+import json
+
 
 class Dictonary_Entry:
-    def __init__(self, word):
-        root = self.load_dict(word)
-        element = self.search_word(word, root)
-        if not element:
-            raise Exception("Word not found")
-        self.defitions = self.get_body_variants(element)   
+    NAME_KEY = "name"
+    PRONOUNCIATION_KEY = "pronounciation"
 
-    def load_dict(self,word):
+    def __init__(self, word):
+        self.word = word
+        root = self.load_dict(word)
+        self.element = self.get_word_as_element(word, root)
+        if not self.element:
+            raise Exception("Word not found")
+        print("Element created for {}".format(word))
+
+    def load_dict(self, word):
         def strip_accents(text):
             try:
                 text = unicode(text, 'utf-8')
-            except NameError: # unicode is a default on python 3 
+            except NameError:  # unicode is a default on python 3
                 pass
 
             text = unicodedata.normalize('NFD', text)\
@@ -33,23 +39,28 @@ class Dictonary_Entry:
 
         return root
 
-
-    def search_word(self,word, root):
+    def get_word_as_element(self, word, root):
         try:
-            element = root.xpath("//entree[@terme='{}']".format(word.upper()))[0]
+            element = root.xpath(
+                "//entree[@terme='{}']".format(word.upper()))[0]
         except IndexError:
             return None
         return element
 
+    def get_pronounciation(self):
+        # return JSON containing word and pronounciation details
+        pronounciation = self.element.xpath("//prononciation")[0]
+        return json.dumps({self.NAME_KEY: self.word,
+                           self.PRONOUNCIATION_KEY: pronounciation.text})
 
-    def get_body_variants(self,element):
+    def get_body_variants(self, element):
         variants = element.findall(".//corps/variante")
         texts = []
         for variant in variants:
             text = variant.text
             if text is not None:
-                #TODO: Handle unicode properly
-                text = text.replace("\n","")
-                text = text.replace("\xa0"," ")
+                # TODO: Handle unicode properly
+                text = text.replace("\n", "")
+                text = text.replace("\xa0", " ")
                 texts.append(text.strip())
         return tuple(texts)
